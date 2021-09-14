@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:codetheatres:Magento_Widget:etc/widget.xsd">
+   <widget class="Configuraly\Configurator\Block\Configurator" id="Configuraly_Configurator_configurator">
+       <label>Configuraly configurator</label>
+       <description>Show a configuraly configurator</description>
+       <parameters>
+           <parameter name="productID" xsi:type="text" required="false" visible="true" sort_order="30">
+               <label translate="true">Product ID </label>
+           </parameter>
+           <parameter name="priceZone" xsi:type="text" required="false" visible="true" sort_order="40">
+               <label translate="true">Pricezone</label>
+           </parameter>
+           <parameter name="language" xsi:type="text" required="false" visible="true" sort_order="50">
+               <label translate="true">Language</label>
+           </parameter>
+       </parameters>
+   </widget>
+</widgets>

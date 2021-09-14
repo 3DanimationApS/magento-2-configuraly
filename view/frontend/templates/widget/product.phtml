@@ -1,0 +1,25 @@
+<?php
+/** @var $block Configuraly\Configurator\Block\Configurator*/
+?>
+
+<div id="configuraly-container"></div>
+<script src="https://configuraly.3d-animation.dk/dist/main.js"></script>
+<link rel="stylesheet" href="https://configuraly.3d-animation.dk/dist/site.css" />
+<script type="text/javascript">
+   Configuraly.init({
+      containerElement: document.getElementById('configuraly-container'),
+      productID: "<?= $block->escapeHtml($block->getData('productID')) ?>",
+      priceZone: <?= $block->getData('priceZone') ? "\"".$block->escapeHtml($block->getData('priceZone'))."\"" : "undefined" ?>,
+      language: <?= $block->getData('language') ? "\"".$block->escapeHtml($block->getData('language'))."\"" : "undefined" ?>,
+      onAddToCart: (product) => {
+         jQuery.post("<?=$block->getUrl('configuraly/cart/add');?>", {configuration: product})
+            .done(function( data ) {
+               if(data.success){
+                     alert('Din konfiguration er lagt i kurven');
+               }else{
+                     alert('Det var desværre ikke muligt at ligge alle varene i kurven\r\nmanglende varer: ' + data.missingProducts.join(','));
+               }
+            });
+      }
+   });
+</script>
