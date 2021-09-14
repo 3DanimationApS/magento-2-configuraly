@@ -4,11 +4,6 @@
     "type": "magento2-module",
     "version": "1.0.0",
     "license": "GPL-3.0-only",
-    "require": {
-        "php": "~7.1.3||~7.2.0||~7.3.0||~7.4.0"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "autoload": {
         "files": [
             "registration.php"
@@ -16,5 +11,7 @@
         "psr-4": {
             "Configuraly\\Configurator\\": ""
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
