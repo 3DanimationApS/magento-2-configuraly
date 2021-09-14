@@ -1,5 +1,5 @@
 {
-    "name": "Configuraly/Configurator",
+    "name": "configuraly/configurator",
     "description": "A module that add a configuraly configurator",
     "type": "magento2-module",
     "version": "1.0.0",
