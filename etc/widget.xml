@@ -14,6 +14,9 @@
            <parameter name="language" xsi:type="text" required="false" visible="true" sort_order="50">
                <label translate="true">Language</label>
            </parameter>
+           <parameter name="preset" xsi:type="text" required="false" visible="true" sort_order="60">
+               <label translate="true">Preset</label>
+           </parameter>
        </parameters>
    </widget>
 </widgets>

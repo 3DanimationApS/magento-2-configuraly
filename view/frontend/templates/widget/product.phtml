@@ -11,6 +11,7 @@
       productID: "<?= $block->escapeHtml($block->getData('productID')) ?>",
       priceZone: <?= $block->getData('priceZone') ? "\"".$block->escapeHtml($block->getData('priceZone'))."\"" : "undefined" ?>,
       language: <?= $block->getData('language') ? "\"".$block->escapeHtml($block->getData('language'))."\"" : "undefined" ?>,
+      preset: <?= $block->getData('preset') ? "\"".$block->escapeHtml($block->getData('preset'))."\"" : "undefined" ?>,
       onAddToCart: (product) => {
          jQuery.post("<?=$block->getUrl('configuraly/cart/add');?>", {configuration: product})
             .done(function( data ) {
