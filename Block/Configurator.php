@@ -7,5 +7,5 @@ use Magento\Widget\Block\BlockInterface;
 
 class Configurator extends Template implements BlockInterface
 {
-    protected $_template = "widget/product.phtml";
+  protected $_template = "widget/product.phtml";
 }
