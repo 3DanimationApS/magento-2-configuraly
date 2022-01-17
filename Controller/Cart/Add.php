@@ -104,19 +104,21 @@ abstract class Add extends \Magento\Framework\App\Action\Action implements HttpP
 
       $missingProducts = array();
 
-      for ($i = 0; $i < count($configuration['parts']); $i++) {
-        $sku = $configuration['parts'][$i]['partnumber'];
-        $quantity = $configuration['parts'][$i]['quantity'];
+      if(!empty($configuration['parts'])){
+        for ($i = 0; $i < count($configuration['parts']); $i++) {
+          $sku = $configuration['parts'][$i]['partnumber'];
+          $quantity = $configuration['parts'][$i]['quantity'];
 
-        $product = $this->AddProduct($sku, $quantity);
+          $product = $this->AddProduct($sku, $quantity);
 
-        if ($product == null) {
-          $missingProducts[] = $sku;
+          if ($product == null) {
+            $missingProducts[] = $sku;
+          }
         }
-      }
 
-      $this->cart->save();
-      $this->session->setCartWasUpdated(true);
+        $this->cart->save();
+        $this->session->setCartWasUpdated(true);
+      }
 
       $result = array();
       $result['success'] = count($missingProducts) == 0;
