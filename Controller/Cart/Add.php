@@ -104,7 +104,7 @@ abstract class Add extends \Magento\Framework\App\Action\Action implements HttpP
 
       $missingProducts = array();
 
-      if(!empty($configuration['parts'])){
+      if(isset($configuration['parts'])){
         for ($i = 0; $i < count($configuration['parts']); $i++) {
           $sku = $configuration['parts'][$i]['partnumber'];
           $quantity = $configuration['parts'][$i]['quantity'];
