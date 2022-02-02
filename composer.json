@@ -2,7 +2,7 @@
   "name": "configuraly/configurator",
   "description": "A module that adds a configuraly configurator",
   "type": "magento2-module",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "license": "GPL-3.0-only",
   "require": {
     "php": "~7.1.3||~7.2.0||~7.3.0||~7.4.0"
