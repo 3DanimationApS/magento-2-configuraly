@@ -7,7 +7,7 @@ use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-abstract class Add extends \Magento\Framework\App\Action\Action implements HttpPostActionInterface
+class Add extends \Magento\Framework\App\Action\Action implements HttpPostActionInterface
 {
   /**
    * @var \Magento\Catalog\Api\ProductRepositoryInterface
