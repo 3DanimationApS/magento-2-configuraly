@@ -1,26 +1,50 @@
 <?php
-/** @var $block Configuraly\Configurator\Block\Configurator*/
+/** @var $block Configuraly\Configurator\Block\Configurator */
 ?>
 
 <div id="configuraly-container"></div>
 <script src="https://configuraly.3d-animation.dk/dist/main.js"></script>
 <link rel="stylesheet" href="https://configuraly.3d-animation.dk/dist/site.css" />
 <script type="text/javascript">
-   Configuraly.init({
-      containerElement: document.getElementById('configuraly-container'),
-      productID: "<?= $block->escapeHtml($block->getData('productID')) ?>",
-      priceZone: <?= $block->getData('priceZone') ? "\"".$block->escapeHtml($block->getData('priceZone'))."\"" : "undefined" ?>,
-      language: <?= $block->getData('language') ? "\"".$block->escapeHtml($block->getData('language'))."\"" : "undefined" ?>,
-      preset: <?= $block->getData('preset') ? "\"".$block->escapeHtml($block->getData('preset'))."\"" : "undefined" ?>,
-      onAddToCart: (product) => {
-         jQuery.post("<?=$block->getUrl('configuraly/cart/add');?>", {configuration: product})
-            .done(function( data ) {
-               if(data.success){
-                     alert('Din konfiguration er lagt i kurven');
-               }else{
-                     alert('Det var desværre ikke muligt at ligge alle varene i kurven\r\nmanglende varer: ' + data.missingProducts.join(','));
-               }
-            });
-      }
-   });
+    Configuraly.init({
+        containerElement: document.getElementById('configuraly-container'),
+        productID: "<?= $block->escapeHtml($block->getData('productID')) ?>",
+        priceZone: <?= $block->getData('priceZone') ? "\"".$block->escapeHtml($block->getData('priceZone'))."\"" : "undefined" ?>,
+        language: <?= $block->getData('language') ? "\"".$block->escapeHtml($block->getData('language'))."\"" : "undefined" ?>,
+        onAddToCart: (product) => {
+            var languageCode = <?= $block->getData('language') ? "\"".$block->escapeHtml($block->getData('language'))."\"" : "undefined" ?>;
+            var successMessage = "";
+            var errorMessage = "";
+
+            // Map language codes to success and error messages
+            switch (languageCode) {
+                case "da-DK":
+                    successMessage = "Din konfiguration er lagt i kurven";
+                    errorMessage = "Det var desværre ikke muligt at ligge alle varene i kurven\r\nmanglende varer: ";
+                    break;
+                case "en-US":
+                    successMessage = "Your configuration has been added to the cart";
+                    errorMessage = "Unfortunately, it was not possible to add all items to the cart\r\nmissing items: ";
+                    break;
+                case "de-DE":
+                    successMessage = "Ihre Konfiguration wurde dem Warenkorb hinzugefügt";
+                    errorMessage = "Leider war es nicht möglich, alle Artikel in den Warenkorb zu legen\r\nfehlende Artikel: ";
+                    break;
+                // Add more cases for other languages as needed
+                default:
+                    successMessage = "Your configuration has been added to the cart";
+                    errorMessage = "Unfortunately, it was not possible to add all items to the cart\r\nmissing items: ";
+                    break;
+            }
+
+            jQuery.post("<?=$block->getUrl('configuraly/cart/add');?>", {configuration: product})
+                .done(function (data) {
+                    if (data.success) {
+                        alert(successMessage);
+                    } else {
+                        alert(errorMessage + data.missingProducts.join(','));
+                    }
+                });
+        }
+    });
 </script>
