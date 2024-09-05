@@ -58,73 +58,95 @@ class Add extends \Magento\Framework\App\Action\Action implements HttpPostAction
    * @return \Magento\Catalog\Model\Product
    */
   protected function AddProduct($SKU, $quantity)
-  {
+{
     try {
-      $product = $this->productRepository->get($SKU);
+        $product = $this->productRepository->get($SKU);
+        
+        $parentByChild = $this->catalogProductTypeConfigurable->getParentIdsByChild($product->getId());
 
-      $parentByChild = $this->catalogProductTypeConfigurable->getParentIdsByChild($product->getId());
+        if (isset($parentByChild[0])) {
+            $parentProduct = $this->productRepository->getById($parentByChild[0]);
+            $options = $this->getConfigurableOptions($parentProduct, $product);
+            
+            $params = array(
+                'product' => $parentProduct->getId(),
+                'qty' => $quantity,
+                'super_attribute' => $options
+            );
+            $request = new \Magento\Framework\DataObject();
+            $request->setData($params);
 
-      if (isset($parentByChild[0])) {
-        $parentproduct = $this->productRepository->getById($parentByChild[0]);
-        $productAttributeOptions = $parentproduct->getTypeInstance()->getConfigurableAttributesAsArray($parentproduct);
-        $options = array();
-
-        foreach ($productAttributeOptions as $productAttribute) {
-          $allValues = array_column($productAttribute['values'], 'value_index');
-          $currentProductValue = $product->getData($productAttribute['attribute_code']);
-          if (in_array($currentProductValue, $allValues)) {
-            $options[$productAttribute['attribute_id']] = $currentProductValue;
-          }
+            $this->cart->addProduct($parentProduct, $request);
+        } else {
+            $this->cart->addProduct($product, $quantity);
         }
-
-        $params = array(
-          'product' => $parentproduct->getId(),
-          'qty' => $quantity,
-          'super_attribute' => $options
-        );
-        $request = new \Magento\Framework\DataObject();
-        $request->setData($params);
-
-        $this->cart->addProduct($parentproduct, $request);
-      } else {
-        $this->cart->addProduct($product, $quantity);
-      }
+        
+        // Important: Save the cart after each product addition
+        $this->cart->save();
+        
     } catch (NoSuchEntityException $noEntityException) {
-      return null;
+        return null;
+    } catch (\Exception $e) {
+        // Log the exception
+        // $this->logger->error('Error adding product ' . $SKU . ': ' . $e->getMessage());
+        return null;
     }
 
     return $product;
-  }
+}
+
+protected function getConfigurableOptions($parentProduct, $childProduct)
+{
+    $options = array();
+    $productAttributeOptions = $parentProduct->getTypeInstance()->getConfigurableAttributesAsArray($parentProduct);
+
+    foreach ($productAttributeOptions as $productAttribute) {
+        $allValues = array_column($productAttribute['values'], 'value_index');
+        $currentProductValue = $childProduct->getData($productAttribute['attribute_code']);
+        if (in_array($currentProductValue, $allValues)) {
+            $options[$productAttribute['attribute_id']] = $currentProductValue;
+        }
+    }
+
+    return $options;
+}
 
   public function execute()
-  {
+{
     $response = $this->resultJsonFactory->create();
     if ($this->getRequest()->isAjax()) {
-      $configuration = $this->getRequest()->getParam('configuration');
+        $configuration = $this->getRequest()->getParam('configuration');
 
-      $missingProducts = array();
+        $missingProducts = array();
+        $addedProducts = array();
 
-      if(isset($configuration['parts']) && is_array($configuration['parts'])){
-        for ($i = 0; $i < count($configuration['parts']); $i++) {
-          $sku = $configuration['parts'][$i]['partnumber'];
-          $quantity = $configuration['parts'][$i]['quantity'];
+        if(isset($configuration['parts']) && is_array($configuration['parts'])){
+            foreach ($configuration['parts'] as $part) {
+                $sku = $part['partnumber'];
+                $quantity = $part['quantity'];
 
-          $product = $this->AddProduct($sku, $quantity);
+                $product = $this->AddProduct($sku, $quantity);
 
-          if ($product == null) {
-            $missingProducts[] = $sku;
-          }
+                if ($product === null) {
+                    $missingProducts[] = $sku;
+                } else {
+                    $addedProducts[] = $sku;
+                }
+            }
+
+            // Remove this line as we're saving after each addition
+            // $this->cart->save();
+            
+            $this->session->setCartWasUpdated(true);
         }
 
-        $this->cart->save();
-        $this->session->setCartWasUpdated(true);
-      }
+        $result = array(
+            'success' => count($missingProducts) === 0,
+            'missingProducts' => $missingProducts,
+            'addedProducts' => $addedProducts
+        );
 
-      $result = array();
-      $result['success'] = count($missingProducts) == 0;
-      $result['missingProducts'] = $missingProducts;
-
-      return $response->setData($result);
+        return $response->setData($result);
     }
-  }
+}
 }
